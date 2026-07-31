@@ -53,6 +53,12 @@ jobs:
       - name: Disable Jekyll
         run: touch out/.nojekyll
 
+      # Fail loudly rather than deploying a broken share card. This invitation
+      # travels by WhatsApp, so og.png resolving with an image content type is
+      # a release requirement, not a nicety.
+      - name: Verify the share card exists
+        run: test -s out/og.png && file out/og.png | grep -q PNG
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

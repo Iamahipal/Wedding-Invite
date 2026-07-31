@@ -10,11 +10,18 @@ import { couple, weddingDateDisplay } from '@/data/wedding'
  *
  * Deliberately built from CSS rather than a photo so it stays correct before
  * any real photographs exist — swap in a background <img> once you have one.
+ *
+ * ── Why a route at /og.png rather than app/opengraph-image.tsx ────────────
+ * The file convention emits a file named `opengraph-image` with NO extension,
+ * which GitHub Pages serves as application/octet-stream — a content type link
+ * crawlers refuse to render. Worse, the convention silently OVERRIDES an
+ * explicit `openGraph.images` in metadata, so you cannot simply point the tag
+ * elsewhere; verified by inspecting the built HTML. Generating from a route
+ * whose path already ends in .png gives the right content type on every host,
+ * and keeps the card regenerating automatically from data/wedding.ts.
  */
 
-export const alt = `${couple.groom.firstName} & ${couple.bride.firstName} — Wedding Invitation`
-export const size = { width: 1200, height: 630 }
-export const contentType = 'image/png'
+const size = { width: 1200, height: 630 }
 
 /**
  * Render once at build time into a real PNG file.
@@ -26,7 +33,7 @@ export const contentType = 'image/png'
  */
 export const dynamic = 'force-static'
 
-export default async function OpengraphImage() {
+export async function GET() {
   return new ImageResponse(
     (
       <div

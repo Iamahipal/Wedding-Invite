@@ -133,7 +133,9 @@ Import the repo. Set `NEXT_PUBLIC_RSVP_ENDPOINT` and `NEXT_PUBLIC_SITE_URL`; lea
 
 ### The share card
 
-[`app/opengraph-image.tsx`](app/opengraph-image.tsx) generates the preview that appears when the link is pasted into WhatsApp or Instagram. Given how this invitation will actually travel, it's worth looking at before you send anything.
+[`app/og.png/route.tsx`](app/og.png/route.tsx) generates the preview that appears when the link is pasted into WhatsApp or Instagram. Given how this invitation actually travels, look at it before you send anything — open `/Wedding-Invite/og.png` directly.
+
+It's a route at a `.png` path rather than Next's `app/opengraph-image.tsx` convention on purpose. That convention emits a file with **no extension**, which a static host serves as `application/octet-stream` — and link crawlers won't render that. It also silently overrides an explicit `openGraph.images` in metadata, so you can't just point the tag somewhere else. The deploy workflow asserts `out/og.png` is a real PNG and fails the build if it isn't.
 
 ---
 
