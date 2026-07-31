@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { copy, gallery } from '@/data/wedding'
+import { asset } from '@/lib/asset'
 import { getSettings } from '@/lib/quality'
 import { useUiStore } from '@/lib/uiStore'
 import { RevealText, Reveal } from '@/components/ui/RevealText'
@@ -76,7 +77,12 @@ export function Gallery() {
                 <figure className="glass grain overflow-hidden rounded-2xl p-2">
                   <div className="relative aspect-3/2 overflow-hidden rounded-xl">
                     <Image
-                      src={item.src}
+                      // asset() even here. next/image normally applies the
+                      // base path for you — but NOT with `unoptimized: true`,
+                      // which a static host requires. Verified: without this
+                      // every photo 404s on GitHub Pages while working
+                      // perfectly on localhost.
+                      src={asset(item.src)}
                       alt={item.alt}
                       fill
                       sizes="(max-width: 640px) 78vw, (max-width: 1024px) 52vw, 30vw"

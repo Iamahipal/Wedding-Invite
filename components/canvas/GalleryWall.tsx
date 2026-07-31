@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { gallery } from '@/data/wedding'
+import { asset } from '@/lib/asset'
 import { sceneProgress, clamp, smoothstep } from '@/lib/scrollStore'
 
 /**
@@ -96,7 +97,9 @@ function Frame({ texture, index }: FrameProps) {
 }
 
 export function GalleryWall() {
-  const urls = useMemo(() => gallery.map((item) => item.src), [])
+  // asset() — useTexture fetches these directly, so Next never gets a chance
+  // to apply the base path for us. See lib/asset.ts.
+  const urls = useMemo(() => gallery.map((item) => asset(item.src)), [])
   const loaded = useTexture(urls)
   const textures = useMemo(() => {
     const list = Array.isArray(loaded) ? loaded : [loaded]

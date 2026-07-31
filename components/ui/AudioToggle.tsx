@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { asset } from '@/lib/asset'
 import { useUiStore } from '@/lib/uiStore'
 
 /**
@@ -18,7 +19,7 @@ import { useUiStore } from '@/lib/uiStore'
  * wedding invitation that gets closed.
  */
 
-const SRC = '/audio/ambient.mp3'
+const SRC = asset('/audio/ambient.mp3')
 const TARGET_VOLUME = 0.32
 const FADE_MS = 900
 

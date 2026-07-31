@@ -16,6 +16,16 @@ export const alt = `${couple.groom.firstName} & ${couple.bride.firstName} — We
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
+/**
+ * Render once at build time into a real PNG file.
+ *
+ * Required for `output: 'export'` — a static host has no runtime to generate
+ * the card on request, and without this the export fails outright. It's also
+ * simply better here: the card never changes between requests, so paying for
+ * it once at build is free.
+ */
+export const dynamic = 'force-static'
+
 export default async function OpengraphImage() {
   return new ImageResponse(
     (

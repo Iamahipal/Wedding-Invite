@@ -117,9 +117,19 @@ Other decisions worth knowing about before you change them:
 
 ## Deploying
 
-Push to GitHub and import the repo on Vercel. Set `NEXT_PUBLIC_RSVP_ENDPOINT` and `NEXT_PUBLIC_SITE_URL` in the project's environment variables.
+### GitHub Pages (live now)
 
-For a static host (GitHub Pages, Netlify drop) uncomment the two lines at the bottom of [`next.config.ts`](next.config.ts). You lose `next/image` optimisation and the generated share card becomes a build-time PNG.
+**https://iamahipal.github.io/Wedding-Invite/**
+
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds a static export and publishes it on every push to the default branch. Nothing to configure — `actions/configure-pages` enables Pages via the API on the first run.
+
+To make the RSVP form write to your Sheet, add a repository secret named `RSVP_ENDPOINT` (Settings → Secrets and variables → Actions) containing your Apps Script `/exec` URL, then re-run the workflow. Without it the form still validates and confirms; it just doesn't save.
+
+> **Sub-path gotcha, if you touch asset loading.** Pages serves this from `/Wedding-Invite/`, not the domain root. Next rewrites URLs for `next/link`, but **not** for raw strings — and **not for `next/image` under `images.unoptimized`**, which a static host requires. Anything that reaches the network outside Next's routing has to go through [`asset()`](lib/asset.ts) or it will 404 in production while working perfectly on localhost.
+
+### Vercel
+
+Import the repo. Set `NEXT_PUBLIC_RSVP_ENDPOINT` and `NEXT_PUBLIC_SITE_URL`; leave `NEXT_OUTPUT` and `NEXT_PUBLIC_BASE_PATH` unset. You get a server build at the domain root with `next/image` optimisation, and `asset()` becomes a no-op.
 
 ### The share card
 

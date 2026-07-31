@@ -1,0 +1,68 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [claude/wedding-invitation-site-wlgth0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deployments race. `cancel-in-progress: false` so a queued
+# deploy finishes rather than being dropped halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `enablement: true` turns Pages on via the API if it isn't already,
+      # so there is no manual step in repo Settings.
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - run: npm ci
+
+      - name: Build static export
+        run: npm run build
+        env:
+          NEXT_OUTPUT: export
+          # The site lives at /Wedding-Invite/, not the domain root.
+          NEXT_PUBLIC_BASE_PATH: /Wedding-Invite
+          NEXT_PUBLIC_SITE_URL: https://iamahipal.github.io/Wedding-Invite
+          # Optional. Add a repository secret named RSVP_ENDPOINT with your
+          # Apps Script /exec URL to make the form write to your Sheet.
+          # Without it the form still works and shows its success state.
+          NEXT_PUBLIC_RSVP_ENDPOINT: ${{ secrets.RSVP_ENDPOINT }}
+
+      # Pages runs Jekyll by default, and Jekyll skips any directory starting
+      # with an underscore — which would silently drop the whole of _next/
+      # and serve an unstyled, script-less page.
+      - name: Disable Jekyll
+        run: touch out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
